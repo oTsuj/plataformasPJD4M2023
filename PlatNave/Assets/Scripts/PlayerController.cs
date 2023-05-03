@@ -12,6 +12,10 @@ public class PlayerController : MonoBehaviour
     private Vector2 _moveInput;
     private bool _isShooting;
 
+    private int _currentEnergy;
+    [SerializeField] private int maxEnergy;
+    private int _points;
+
     private void OnEnable()
     {
         _playerInput.onActionTriggered += OnAction;
@@ -43,6 +47,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void AddEnergy(int amount)
+    {
+        _currentEnergy = Mathf.Clamp(_currentEnergy + amount, 0, maxEnergy);
+    }
+
+    private void AddPoints(int amount)
+    {
+        _points += amount;
+        PlayerObserverManager.PointsChanged(_points);
+    }
+
     private void OnDisable()
     {
         _playerInput.onActionTriggered -= OnAction;
@@ -52,11 +67,17 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _gameControls = new GameControls();
+
+        _currentEnergy = maxEnergy;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(Keyboard.current.jKey.wasPressedThisFrame) AddEnergy(amount:10);
         
+        if(Keyboard.current.kKey.wasPressedThisFrame) AddEnergy(amount:-10);
+        
+        if(Keyboard.current.lKey.wasPressedThisFrame) AddPoints(amount:100);
     }
 }
